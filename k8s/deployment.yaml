@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: nodejs-app
-        image: s223743838/aa
+        image: s223743838/node-ca:v1
         ports:
         - containerPort: 3006
         
