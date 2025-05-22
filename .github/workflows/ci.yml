@@ -24,7 +24,7 @@ jobs:
         install_components: kubectl
 
     - name: Configure kubectl for GKE
-      run: gcloud container clusters get-credentials sit707-cluster --zone australia-southeast2-a
+      run: gcloud container clusters get-credentials sit707-cluster --zone australia-southeast2
 
     - name: Install Node.js
       uses: actions/setup-node@v3
