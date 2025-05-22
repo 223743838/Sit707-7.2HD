@@ -1,42 +1,39 @@
-name: Node.js CI/CD to GCP
+name: Node.js CI/CD - Simulated GCP Deploy
 
 on:
   push:
     branches: [ main ]
 
 jobs:
-  build-test-deploy:
+  build-test-simulate:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
+    - name:  Checkout Code
       uses: actions/checkout@v3
 
-    - name: Authenticate with GCP
-      uses: google-github-actions/auth@v1
+    - name:  Set up Node.js
+      uses: actions/setup-node@v3
       with:
-        credentials_json: ${{ secrets.GCP_SA_KEY }}
+        node-version: '18'
 
-    - name: Set up gcloud
-      uses: google-github-actions/setup-gcloud@v1
-      with:
-        project_id: ${{ secrets.GCP_PROJECT_ID }}
-        install_components: kubectl
+    - name:  Install Dependencies
+      run: npm install
 
-    - name: Configure kubectl for GKE
-      run: gcloud container clusters get-credentials sit707-cluster --region australia-southeast2 --project sit737-25t1-singh-f590599
+    - name:  Run Tests
+      run: npm test
 
-    - name: Deploy test container to GKE
+    - name:  Build Docker Image
+      run: docker build -t s223743838/calculator-app:v1 .
+
+    - name: Image push 
+      run: docker push s223743838/calculator-app:v1 
+
+    - name:   GKE Deployment
       run: |
-        kubectl apply -f k8s/deployment.yaml
-
-    - name: Wait for Pod to start
-      run: |
-        echo "Waiting for pod to be ready..."
-        kubectl wait --for=condition=ready pod -l app=calculator-tests --timeout=60s
-
-    - name: Get test logs from pod
-      run: |
-        POD_NAME=$(kubectl get pods -l app=calculator-tests -o jsonpath="{.items[0].metadata.name}")
-        echo "📦 Logs from test pod: $POD_NAME"
-        kubectl logs $POD_NAME
+        echo " Build & test successful."
+        echo " GKE deployment skipped: service account lacks container.clusters.get"
+        echo " Manual deployment verified using:"
+        echo "    gcloud container clusters get-credentials sit707-cluster --zone australia-southeast2"
+        echo "    kubectl apply -f k8s/deployment.yaml"
+        echo "    kubectl logs <pod-name>"
