@@ -24,27 +24,19 @@ jobs:
         install_components: kubectl
 
     - name: Configure kubectl for GKE
-      run: gcloud container clusters get-credentials sit707-cluster --zone australia-southeast2
+      run: gcloud container clusters get-credentials sit707-cluster --region australia-southeast2 --project sit737-25t1-singh-f590599
 
-    - name: Install Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '18'
-
-    - name: Install dependencies and run tests
-      run: |
-        npm install
-        npm test
-
-    - name: Build Docker image
-      run: |
-        docker build -t s223743838/calculator-app:latest .
-
-    - name: Push Docker image to GCP
-      run: |
-        gcloud auth configure-docker
-        docker push s223743838/calculator-app:latest
-
-    - name: Deploy to GKE
+    - name: Deploy test container to GKE
       run: |
         kubectl apply -f k8s/deployment.yaml
+
+    - name: Wait for Pod to start
+      run: |
+        echo "Waiting for pod to be ready..."
+        kubectl wait --for=condition=ready pod -l app=calculator-tests --timeout=60s
+
+    - name: Get test logs from pod
+      run: |
+        POD_NAME=$(kubectl get pods -l app=calculator-tests -o jsonpath="{.items[0].metadata.name}")
+        echo "📦 Logs from test pod: $POD_NAME"
+        kubectl logs $POD_NAME
