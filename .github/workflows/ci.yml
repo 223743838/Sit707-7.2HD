@@ -26,9 +26,6 @@ jobs:
     - name:  Build Docker Image
       run: docker build -t s223743838/calculator-app:v1 .
 
-    - name: Image push 
-      run: docker push s223743838/calculator-app:v1 
-
     - name:   GKE Deployment
       run: |
         echo " Build & test successful."
