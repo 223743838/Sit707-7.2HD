@@ -9,5 +9,5 @@ test('subtracts 5 - 3 to equal 2', () => {
 });
 
 test('intentional fail: 2 + 2 to equal 5', () => {
-  expect(add(2, 2)).toBe(5); // Fail
+  expect(add(2, 2)).toBe(4); 
 });
