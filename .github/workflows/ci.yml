@@ -26,7 +26,7 @@ jobs:
         uses: google-github-actions/auth@v1
         with:
           credentials_json: ${{ secrets.GCP_SA_KEY }}
-
+          create_credentials_file: false
       - name: Set up gcloud CLI
         uses: google-github-actions/setup-gcloud@v1
         with:
